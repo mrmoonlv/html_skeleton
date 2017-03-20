@@ -7,6 +7,7 @@
 ### Installation
 ```sh
 $ git clone https://github.com/mrmoonlv/html_skeleton.git
+$ cd html_skeleton
 $ npm install
 $ bower install
 $ gulp
