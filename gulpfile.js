@@ -1,0 +1,54 @@
+var gulp        = require('gulp');
+var sass        = require('gulp-sass');
+var minify      = require('gulp-minify-css');
+var concat      = require('gulp-concat');
+var browserSync = require('browser-sync').create();
+
+var rootDir = './public/';
+var srcDir = './src/';
+var sources = {
+    web: [rootDir+'**/*.+(svg|js|css|php|html|jpg|gif|png)'],
+    sass: [srcDir+'sass/app.scss'],
+    sassSources: [srcDir+'sass/**/*'],
+    jsSources:[
+        srcDir+'bower_components/jquery/dist/jquery.min.js',
+        srcDir+'bower_components/tether/dist/js/tether.min.js',
+        srcDir+'/bower_components/bootstrap/dist/js/bootstrap.min.js',
+        srcDir+'scripts/*.js'
+    ]
+};
+
+var onError = function(error) {
+    console.log( 'An error occurred:', error.message );
+    this.emit( 'end' );
+};
+
+gulp.task('serve', ['sass'], function() {
+
+    browserSync.init({
+        server: rootDir
+    });
+
+    gulp.watch(sources.sassSources, ['sass']);
+    gulp.watch(rootDir+"*.html").on('change', browserSync.reload);
+
+    gulp.watch(srcDir+"scripts/*.js", ['scripts']);
+    gulp.watch(rootDir+"assets/js/app.js").on('change', browserSync.reload);
+});
+
+gulp.task('sass', function() {
+    gulp.src(sources.sass)
+        .pipe(sass().on('error', onError))
+        .pipe(minify({keepBreaks: false}))
+        .pipe(concat(rootDir + 'assets/css/style.min.css'))
+        .pipe(gulp.dest('.'))
+        .pipe(browserSync.stream());
+});
+
+gulp.task('scripts', function() {
+    return gulp.src(sources.jsSources)
+        .pipe(concat('app.js'))
+        .pipe(gulp.dest(rootDir+'assets/js/'));
+});
+
+gulp.task('default', ['sass', 'scripts', 'serve']);
