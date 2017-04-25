@@ -1,7 +1,9 @@
-var gulp        = require('gulp');
-var sass        = require('gulp-sass');
-var minify      = require('gulp-minify-css');
-var concat      = require('gulp-concat');
+var gulp = require('gulp');
+var sass = require('gulp-sass');
+var minify = require('gulp-minify-css');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var strip = require('gulp-strip-comments');
 var browserSync = require('browser-sync').create();
 
 var rootDir = './public/';
@@ -45,10 +47,13 @@ gulp.task('sass', function() {
         .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
     return gulp.src(sources.jsSources)
-        .pipe(concat('app.js'))
-        .pipe(gulp.dest(rootDir+'assets/js/'));
+        .pipe(concat('app.min.js'))
+        .pipe(uglify({
+            preserveComments: 'all'
+        }))
+        .pipe(strip())
+        .pipe(gulp.dest(rootDir + 'assets/js/'));
 });
-
 gulp.task('default', ['sass', 'scripts', 'serve']);
