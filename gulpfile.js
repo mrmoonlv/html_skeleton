@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var strip = require('gulp-strip-comments');
 var browserSync = require('browser-sync').create();
+var notify = require("gulp-notify");
 
 var rootDir = './public/';
 var srcDir = './src/';
@@ -17,7 +18,8 @@ var sources = {
         srcDir+'bower_components/tether/dist/js/tether.min.js',
         srcDir+'/bower_components/bootstrap/dist/js/bootstrap.min.js',
         srcDir+'scripts/*.js'
-    ]
+    ],
+    css : rootDir + 'assets/css/style.min.css'
 };
 
 var onError = function(error) {
@@ -42,9 +44,14 @@ gulp.task('sass', function() {
     gulp.src(sources.sass)
         .pipe(sass().on('error', onError))
         .pipe(minify({keepBreaks: false}))
-        .pipe(concat(rootDir + 'assets/css/style.min.css'))
+        .pipe(concat(sources.css))
         .pipe(gulp.dest('.'))
-        .pipe(browserSync.stream());
+        .pipe(browserSync.stream())
+        .pipe(notify({
+            "title": "CSS Generated",
+            "icon":  __dirname  + "/src/images/gulp.png", // case sensitive
+            "onLast": true
+        }));
 });
 
 gulp.task('scripts', function () {
@@ -54,6 +61,11 @@ gulp.task('scripts', function () {
             preserveComments: 'all'
         }))
         .pipe(strip())
-        .pipe(gulp.dest(rootDir + 'assets/js/'));
+        .pipe(gulp.dest(rootDir + 'assets/js/'))
+        .pipe(notify({
+            "title": "JS Generated",
+            "icon":  __dirname  + "/src/images/gulp.png", // case sensitive
+            "onLast": true
+        }));
 });
 gulp.task('default', ['sass', 'scripts', 'serve']);
